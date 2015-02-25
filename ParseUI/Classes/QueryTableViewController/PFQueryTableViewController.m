@@ -145,16 +145,16 @@
     [self.tableView beginUpdates];
 
     // If we're currently showing the pagination cell, we need to hide it during editing.
-    if ([self paginationEnabled] && [self _shouldShowPaginationCell]) {
-        [self.tableView deleteRowsAtIndexPaths:@[ [self _indexPathForPaginationCell] ]
+    if ([self paginationEnabled] && [self shouldShowPaginationCell]) {
+        [self.tableView deleteRowsAtIndexPaths:@[ [self indexPathForPaginationCell] ]
                               withRowAnimation:UITableViewRowAnimationAutomatic];
     }
 
     [super setEditing:editing animated:animated];
 
     // Ensure proper re-insertion of the pagination cell.
-    if ([self paginationEnabled] && [self _shouldShowPaginationCell]) {
-        [self.tableView insertRowsAtIndexPaths:@[ [self _indexPathForPaginationCell] ]
+    if ([self paginationEnabled] && [self shouldShowPaginationCell]) {
+        [self.tableView insertRowsAtIndexPaths:@[ [self indexPathForPaginationCell] ]
                               withRowAnimation:UITableViewRowAnimationAutomatic];
     }
 
@@ -238,6 +238,7 @@
         if (error) {
             _lastLoadCount = -1;
             [self _refreshPaginationCell];
+            [source setError:error];
         } else {
             _currentPage = page;
             _lastLoadCount = [foundObjects count];
@@ -298,7 +299,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     NSInteger count = [self.objects count];
 
-    if ([self _shouldShowPaginationCell]) {
+    if ([self shouldShowPaginationCell]) {
         count += 1;
     }
 
@@ -424,7 +425,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)otherTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     PFTableViewCell *cell;
-    if ([self _shouldShowPaginationCell] && [indexPath isEqual:[self _indexPathForPaginationCell]]) {
+    if ([self shouldShowPaginationCell] && [indexPath isEqual:[self indexPathForPaginationCell]]) {
         // Return the pagination cell on the last cell
         cell = [self tableView:otherTableView cellForNextPageAtIndexPath:indexPath];
     } else {
@@ -446,6 +447,11 @@
     return cell;
 }
 
+// The row of the pagination cell
+- (NSIndexPath *)indexPathForPaginationCell {
+    return [NSIndexPath indexPathForRow:[self.objects count] inSection:0];
+}
+
 #pragma mark -
 #pragma mark UITableViewDelegate
 
@@ -453,14 +459,14 @@
     // Handle selection of the next page row
     if (!_firstLoad &&
         self.paginationEnabled &&
-        [indexPath isEqual:[self _indexPathForPaginationCell]]) {
+        [indexPath isEqual:[self indexPathForPaginationCell]]) {
         [self loadNextPage];
     }
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView
            editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if ([indexPath isEqual:[self _indexPathForPaginationCell]]) {
+    if ([indexPath isEqual:[self indexPathForPaginationCell]]) {
         return UITableViewCellEditingStyleNone;
     }
 
@@ -468,7 +474,7 @@
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath {
-    if ([indexPath isEqual:[self _indexPathForPaginationCell]]) {
+    if ([indexPath isEqual:[self indexPathForPaginationCell]]) {
         return NO;
     }
 
@@ -479,7 +485,7 @@
 #pragma mark Private
 
 // Whether we need to show the pagination cell
-- (BOOL)_shouldShowPaginationCell {
+- (BOOL)shouldShowPaginationCell {
     return (self.paginationEnabled &&
             !self.editing &&
             [self.objects count] != 0 &&
@@ -488,15 +494,10 @@
 
 // Selectively refresh pagination cell
 - (void)_refreshPaginationCell {
-    if ([self _shouldShowPaginationCell]) {
-        [self.tableView reloadRowsAtIndexPaths:@[ [self _indexPathForPaginationCell] ]
+    if ([self shouldShowPaginationCell]) {
+        [self.tableView reloadRowsAtIndexPaths:@[ [self indexPathForPaginationCell] ]
                               withRowAnimation:UITableViewRowAnimationNone];
     }
-}
-
-// The row of the pagination cell
-- (NSIndexPath *)_indexPathForPaginationCell {
-    return [NSIndexPath indexPathForRow:[self.objects count] inSection:0];
 }
 
 - (void)_loadImagesForOnscreenRows {

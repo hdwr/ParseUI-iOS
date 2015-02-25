@@ -142,6 +142,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)objectsDidLoad:(nullable NSError *)error;
 
+// Whether we need to show the pagination cell
+- (BOOL)shouldShowPaginationCell;
+
 ///--------------------------------------
 /// @name Accessing Results
 ///--------------------------------------
@@ -253,6 +256,8 @@ NS_ASSUME_NONNULL_BEGIN
  @return The cell that allows the user to paginate.
  */
 - (nullable PFTableViewCell *)tableView:(UITableView *)tableView cellForNextPageAtIndexPath:(NSIndexPath *)indexPath;
+
+- (NSIndexPath *)indexPathForPaginationCell;
 
 @end
 
