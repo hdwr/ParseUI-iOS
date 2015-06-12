@@ -141,6 +141,9 @@ PFUI_ASSUME_NONNULL_BEGIN
  */
 - (void)objectsDidLoad:(PFUI_NULLABLE NSError *)error;
 
+// Whether we need to show the pagination cell
+- (BOOL)shouldShowPaginationCell;
+
 ///--------------------------------------
 /// @name Accessing Results
 ///--------------------------------------
