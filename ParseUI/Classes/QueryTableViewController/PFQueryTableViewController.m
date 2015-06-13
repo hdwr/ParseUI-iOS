@@ -236,6 +236,7 @@
         if (error) {
             _lastLoadCount = -1;
             [self _refreshPaginationCell];
+            [source setError:error];
         } else {
             _currentPage = page;
             _lastLoadCount = [foundObjects count];
@@ -250,8 +251,6 @@
 
         [self objectsDidLoad:error];
         [self.refreshControl endRefreshing];
-
-        [source setError:error];
     }];
 
     return source.task;
